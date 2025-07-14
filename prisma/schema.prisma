@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User_Stacks {
+  id_user    Int
+  id_stack   Int
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  stack      Stacks   @relation(fields: [id_stack], references: [id])
+  user       Users    @relation(fields: [id_user], references: [id])
+
+  @@id([id_user, id_stack])
+}
+
+model Connections {
+  id                                 Int      @id(map: "Connection_pkey") @default(autoincrement())
+  requester                          Int
+  target                             Int
+  status                             String
+  created_at                         DateTime @default(now())
+  Users_Connections_requesterToUsers Users    @relation("Connections_requesterToUsers", fields: [requester], references: [id], map: "Connection_requester_fkey")
+  Users_Connections_targetToUsers    Users    @relation("Connections_targetToUsers", fields: [target], references: [id], map: "Connection_target_fkey")
+}
+
+model Posts {
+  id         Int      @id(map: "Post_pkey") @default(autoincrement())
+  user_id    Int
+  content    String
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  Users      Users    @relation(fields: [user_id], references: [id], map: "Post_user_id_fkey")
+}
+
+model Stacks {
+  id          Int           @id(map: "Stack_pkey") @default(autoincrement())
+  name        String        @db.VarChar(20)
+  created_at  DateTime      @default(now()) @db.Timestamp(6)
+  user_stacks User_Stacks[]
+}
+
+model Users {
+  id                                       Int           @id(map: "User_pkey") @default(autoincrement())
+  name                                     String        @db.VarChar(100)
+  email                                    String        @unique(map: "User_email_key") @db.VarChar(100)
+  password                                 String
+  created_at                               DateTime      @default(now()) @db.Timestamp(6)
+  updated_at                               DateTime      @default(now()) @db.Timestamp(6)
+  role                                     String        @db.VarChar(20)
+  bio                                      String?       @db.VarChar(200)
+  city                                     String?       @db.VarChar(20)
+  uf                                       String?       @db.VarChar(2)
+  avatar_url                               String?       @db.VarChar(255)
+  Connections_Connections_requesterToUsers Connections[] @relation("Connections_requesterToUsers")
+  Connections_Connections_targetToUsers    Connections[] @relation("Connections_targetToUsers")
+  Posts                                    Posts[]
+  user_stacks                              User_Stacks[]
+}

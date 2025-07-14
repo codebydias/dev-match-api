@@ -1,0 +1,14 @@
+services:
+  db:                          # Nome do serviço (você usa isso em outros containers se quiser conectar)
+    image: postgres:15         # Imagem do Postgres, versão 15
+    environment:              # Variáveis de ambiente (para criar o banco e autenticar)
+      POSTGRES_DB: devmatch
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: supersecure
+    ports:
+      - "5432:5432"            # Porta interna (container) : externa (sua máquina)
+    volumes:
+      - pgdata:/var/lib/postgresql/data  # Volume pra persistência
+
+volumes:
+  pgdata:                      # Nome do volume (vai salvar os dados aqui)
