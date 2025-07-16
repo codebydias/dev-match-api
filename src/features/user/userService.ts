@@ -10,6 +10,7 @@ export async function createUserService(data: CreateUserInput) {
 
 
 export async function loginUserService(data: LoginUserInput) {
+  
   const user = await prisma.users.findFirst({
     where: { email: data.email }
   });
@@ -18,8 +19,8 @@ export async function loginUserService(data: LoginUserInput) {
     throw new Error("Usuário não encontrado");
   }
 
-  const passwordCompare = await bcrypt.compare(data.password, user.password);
-  if (!passwordCompare) {
+  const passwordValid = await bcrypt.compare(data.password, user.password);
+  if (!passwordValid) {
     throw new Error("Senha incorreta");
   }
 
