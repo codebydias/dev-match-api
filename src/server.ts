@@ -3,12 +3,16 @@ import { healthRouter } from './routes/health';
 import cors from './config/cors';
 import jwt from './config/jwt';
 import { userRouter } from './routes/user';
+import { feedRouter } from './routes/feed';
 
-const app = fastify({})
+const app = fastify(
+  // { logger: true }
+)
 
 app.register(async (api) => {
   api.register(healthRouter);
   api.register(userRouter);
+  api.register(feedRouter);
 
 }, { prefix: '/api' });
 
