@@ -8,9 +8,8 @@ export async function createUserService(data: CreateUserInput) {
   return await prisma.users.create({ data });
 }
 
-
 export async function loginUserService(data: LoginUserInput) {
-  
+
   const user = await prisma.users.findFirst({
     where: { email: data.email }
   });
@@ -30,5 +29,19 @@ export async function loginUserService(data: LoginUserInput) {
     email: user.email,
     role: user.role
   };
+}
+
+export async function getMyPostService(user_id: number) {
+
+  const loadMyPosts = await prisma.posts.findMany({
+    orderBy: {
+      created_at: "desc",
+    },
+    where: {
+      user_id: user_id
+    }
+  });
+
+  return loadMyPosts;
 }
 

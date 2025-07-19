@@ -1,5 +1,5 @@
 import { prisma } from "../../plugins/prisma";
-import { CreatePostInput } from "./feedSchema";
+import { CreatePostInput, PatchPostInput } from "./feedSchema";
 
 export async function createPostService(user_id: number, data: CreatePostInput) {
 
@@ -26,6 +26,7 @@ export async function createPostService(user_id: number, data: CreatePostInput) 
 }
 
 export async function getPostService() {
+
     const loadFeed = await prisma.posts.findMany({
         orderBy: {
             created_at: "desc",
@@ -44,16 +45,49 @@ export async function getPostService() {
     return loadFeed;
 }
 
-export async function getMyPostService(user_id: number) {
+export async function getPostByIdService(id: number) {
 
-    const loadMyPosts = await prisma.posts.findMany({
-        orderBy: {
-            created_at: "desc",
-        },
+    const post = await prisma.posts.findUnique({
         where: {
+            id: id
+        }, include: {
+            Users: {
+                select: { id: true, name: true }
+            }
+        },
+    })
+
+    if (!post) {
+        throw new Error("Post não encontrado");
+    }
+
+    return post
+}
+
+export async function patchPostByIdService(id: number, user_id: number, data: PatchPostInput) {
+
+    const post = await prisma.posts.findUnique({
+        where: { id: id }
+    })
+
+    if (!post || post.user_id !== user_id) {
+        throw new Error("Post não encontrado ou você não tem permissão");
+    }
+
+    if (!data.content || data.content.trim() === "") {
+        throw new Error("Conteúdo do post não pode estar vazio");
+    }
+
+
+    const patchPost = await prisma.posts.update({
+        data: {
+            content: data.content ?? post.content,
+        }, where: {
+            id: id,
             user_id: user_id
         }
-    });
+    })
 
-    return loadMyPosts;
+    return patchPost
+
 }

@@ -14,3 +14,4 @@ export const createPostSchema = z.object({
     //     .optional(),
 });
 export type CreatePostInput = z.infer<typeof createPostSchema>;
+export type PatchPostInput = z.infer<typeof createPostSchema>;

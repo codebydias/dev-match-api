@@ -7,6 +7,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Comments {
+  id        Int      @id @default(autoincrement())
+  content   String
+  post_id   Int
+  user_id   Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  
+  post      Posts    @relation(fields: [post_id], references: [id])
+  user      Users     @relation(fields: [user_id], references: [id])
+}
+
 model User_Stacks {
   id_user    Int
   id_stack   Int
@@ -34,6 +46,7 @@ model Posts {
   created_at DateTime @default(now()) @db.Timestamp(6)
   
   Users      Users    @relation(fields: [user_id], references: [id], map: "Post_user_id_fkey")
+  Comments Comments[]
 }
 
 model Stacks {
@@ -50,7 +63,7 @@ model Users {
   email                                    String        @unique(map: "User_email_key") @db.VarChar(100)
   password                                 String
   created_at                               DateTime      @default(now()) @db.Timestamp(6)
-  updated_at                               DateTime      @default(now()) @db.Timestamp(6)
+  updated_at                               DateTime      @updatedAt
   role                                     String        @db.VarChar(20)
   bio                                      String?       @db.VarChar(200)
   city                                     String?       @db.VarChar(20)
@@ -61,4 +74,5 @@ model Users {
 
   Posts                                    Posts[]
   user_stacks                              User_Stacks[]
+  Comments Comments[]
 }

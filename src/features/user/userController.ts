@@ -3,6 +3,7 @@ import { createUserSchema, loginUserSchema } from "./userSchema";
 import bcrypt from "bcrypt";
 import {
     createUserService,
+    getMyPostService,
     loginUserService
 } from "./userService";
 import { prisma } from "../../plugins/prisma";
@@ -59,6 +60,23 @@ export async function loginUserController(req: FastifyRequest, reply: FastifyRep
 
 }
 
+export async function getMyPostController(req: FastifyRequest, reply: FastifyReply) {
+    try {
+        const user = req.user as { id: number; email: string; role: string };
+        const userId = user?.id;
+
+        if (!userId) {
+            return reply.code(401).send({ message: `Usúario não encontrado ${userId}` });
+        }
+
+        const loadPosts = await getMyPostService(userId);
+
+        return reply.send(loadPosts);
+    } catch (err) {
+        console.error("Erro ao carregar postagens:", err);
+        return reply.code(500).send({ message: "Erro interno ao carregar postagens" });
+    }
+}
 
 
 
