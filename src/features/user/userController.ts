@@ -78,5 +78,21 @@ export async function getMyPostController(req: FastifyRequest, reply: FastifyRep
     }
 }
 
+export async function myProfileController(req: FastifyRequest, reply: FastifyReply) {
+    try {
+        const user = req.user as { id: number; email: string; role: string };
+        const userId = user?.id;
 
+        if (!userId) {
+            return reply.code(401).send({ message: `Usúario não encontrado ${userId}` });
+        }
+
+        const loadProfile = await getMyPostService(userId);
+
+        return reply.send(loadProfile);
+    } catch (err) {
+        console.error("Erro ao carregar postagens:", err);
+        return reply.code(500).send({ message: "Erro interno ao carregar postagens" });
+    }
+}
 

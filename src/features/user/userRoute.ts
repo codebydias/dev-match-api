@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import {
     getMyPostController,
     loginUserController,
+    myProfileController,
     registerUserController,
 
 } from "./userController";
@@ -12,5 +13,6 @@ export async function userRoutes(app: FastifyInstance) {
     app.post("/auth/login", loginUserController);
 
     app.get('/me/posts', { preHandler: authenticate }, getMyPostController);
+    app.get('/me/profile', { preHandler: authenticate }, myProfileController);
 
 }
