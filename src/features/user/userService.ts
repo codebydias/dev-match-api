@@ -45,3 +45,19 @@ export async function getMyPostService(user_id: number) {
   return loadMyPosts;
 }
 
+export async function myProfileService(user_id: number) {
+  const profile = await prisma.users.findUniqueOrThrow({
+    where: { id: user_id },
+    select: {
+      name: true,
+      email: true,
+      user_stacks: true,
+      Connections_Connections_requesterToUsers: true,
+      Connections_Connections_targetToUsers: true,
+    },
+  });
+
+  return profile;
+}
+
+
