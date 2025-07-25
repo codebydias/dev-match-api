@@ -4,7 +4,8 @@ import bcrypt from "bcrypt";
 import {
     createUserService,
     getMyPostService,
-    loginUserService
+    loginUserService,
+    myProfileService
 } from "./userService";
 import { prisma } from "../../plugins/prisma";
 
@@ -87,7 +88,7 @@ export async function myProfileController(req: FastifyRequest, reply: FastifyRep
             return reply.code(401).send({ message: `Usúario não encontrado ${userId}` });
         }
 
-        const loadProfile = await getMyPostService(userId);
+        const loadProfile = await myProfileService(userId);
 
         return reply.send(loadProfile);
     } catch (err) {

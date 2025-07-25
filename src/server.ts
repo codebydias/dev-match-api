@@ -10,6 +10,9 @@ import { connectionRoutes } from './features/connections/connectionRoute';
 const app = fastify(
   // { logger: true }
 )
+app.register(cors);
+app.register(jwt);
+;
 
 app.register(async (api) => {
   api.register(healthRouter);
@@ -19,8 +22,8 @@ app.register(async (api) => {
   api.register(connectionRoutes);
 
 }, { prefix: '/api' });
-app.register(cors);
-app.register(jwt);
+
+
 
 app.ready().then(() => {
   // console.log(app.printRoutes({ commonPrefix: false }));
