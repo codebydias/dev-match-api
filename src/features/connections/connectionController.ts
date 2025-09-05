@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { acceptFriendshipService, listingFriendshipService, rejectFriendshipService, requestFriendshipService, } from "./connectionService";
+import { acceptFriendshipService, countFriendsService, listingFriendshipService, rejectFriendshipService, requestFriendshipService, } from "./connectionService";
 
 
 export async function listingFriendshipController(req: FastifyRequest, reply: FastifyReply) {
@@ -19,6 +19,25 @@ export async function listingFriendshipController(req: FastifyRequest, reply: Fa
         return reply.code(500).send({ message: "Erro interno ao carregar postagens" });
     }
 }
+
+export async function countFriendsController(req: FastifyRequest, reply: FastifyReply) {
+    try {
+        const user = req.user as { id: number; email: string; role: string };
+        const userId = user?.id;
+
+        if (!userId) {
+            return reply.code(401).send({ message: `Usúario não encontrado ${userId}` });
+        }
+
+        const countFriends = await countFriendsService(userId);
+
+        return reply.send(countFriends).code(200);
+    } catch (err) {
+        console.error("Erro ao carregar solicitações de amizade:", err);
+        return reply.code(500).send({ message: "Erro interno ao carregar postagens" });
+    }
+}
+
 
 export async function requestFriendShipController(req: FastifyRequest, reply: FastifyReply) {
     try {
@@ -50,9 +69,9 @@ export async function acceptFriendshipController(req: FastifyRequest, reply: Fas
         const user = req.user as { id: number; email: string; role: string };
         const requester_id = user?.id;
 
-        const { target } = req.params as { target: string };
+        const { target_id } = req.params as { target_id: string };
 
-        if (!target) {
+        if (!target_id) {
             return reply.code(400).send({ message: "Usuário alvo não informado" });
         }
 
@@ -60,9 +79,9 @@ export async function acceptFriendshipController(req: FastifyRequest, reply: Fas
             return reply.code(401).send({ message: `Usúario não encontrado ${requester_id}` });
         }
 
-        const friendshipRequest = await acceptFriendshipService(requester_id, Number(target));
+        const accept = await acceptFriendshipService(requester_id, Number(target_id));
 
-        return reply.send(friendshipRequest);
+        return reply.send(accept);
 
     } catch (err) {
         console.error("Erro ao aceitar amizade:", err);

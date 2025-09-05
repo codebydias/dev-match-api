@@ -24,10 +24,36 @@ export async function listingFriendshipService(user_id: number) {
         },
     });
 
-    console.log(listRequests);
     return listRequests
 }
 
+export async function countFriendsService(user_id: number) {
+
+    const userExist = await prisma.users.findUniqueOrThrow({
+        where: {
+            id: user_id
+        }
+    })
+
+    if (!userExist) {
+        throw new Error("Usuario inexistente");
+    }
+
+    const countList = await prisma.connections.count({
+        where: {
+            status: 'ACCEPTED',
+            OR: [
+                { requester: user_id },
+                { target: user_id }
+            ]
+        }
+    })
+
+    
+
+    return countList
+
+}
 
 export async function requestFriendshipService(requester_id: number, target_id: number) {
 
@@ -119,9 +145,8 @@ export async function rejectFriendshipService(user_id: number, requester_id: num
         throw new Error("Solicitação já foi respondida.");
     }
 
-    return await prisma.connections.update({
-        where: { id: orderConnection.id },
-        data: { status: "REJECTED" },
+    return await prisma.connections.delete({
+        where: { id: orderConnection.id }
     });
 }
 
